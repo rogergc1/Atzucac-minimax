@@ -36,6 +36,7 @@ namespace proves2
 
 
         static Dictionary<long, ResultatPosició> visitats = new Dictionary<long, ResultatPosició>();
+        
         static void Main(string[] args)
         {
             Peça[] pecesBlanques = new Peça[4];
@@ -44,614 +45,21 @@ namespace proves2
             Bloqueig[] bloquejosNegres = new Bloqueig[3];
 
             //ESCOLLIR POSICIÓ
-            EstablirPosició1(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres);
+            EstablirPosicióInicial(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres);
+            
             ResultatPosició resultat;
-            Console.WriteLine(DateTime.Now.ToString("h:mm:ss tt"));
+            Console.WriteLine("Hora inici: " + DateTime.Now.ToString("h:mm:ss tt"));
             MostrarTauler(RepresentarTauler(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres),0);
             resultat = Jugar(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres, true, 0);
             Console.WriteLine("Millor moviment: "+resultat.moviment);
-            Console.WriteLine("Qui guanya: "+resultat.resultat);
-            Console.WriteLine("Evaluació: " + resultat.evaluació);
-            Console.WriteLine(DateTime.Now.ToString("h:mm:ss tt"));
-            Console.WriteLine(visitats.Count);
-            Console.WriteLine(Codificar(RepresentarTauler(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres), bloquejosBlanques));
+            Console.WriteLine("Qui guanya(1 negres, 2 taules, 3 blanques i n<=0 s'ha de recórrer a l'heurística): " + resultat.resultat);
+            Console.WriteLine("Avaluació heurística: " + resultat.evaluació);
+            Console.WriteLine("Hora final: " + DateTime.Now.ToString("h:mm:ss tt"));
+            Console.WriteLine("Posicions explorades fins ara: " + visitats.Count);
+            Console.WriteLine("Codi posició: " + Codificar(RepresentarTauler(pecesBlanques, pecesNegres, bloquejosBlanques, bloquejosNegres), bloquejosBlanques));
         }
 
-        //POSICIONS
-        static void EstablirPosició1(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //POSICIO ORIGINAL
-            pecesBlanques[0].cordX = 1;
-            pecesBlanques[0].cordY = 0;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 3;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 5;
-            pecesBlanques[2].cordY = 0;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 7;
-            pecesBlanques[3].cordY = 0;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 0;
-            pecesNegres[0].cordY = 7;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 2;
-            pecesNegres[1].cordY = 7;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 4;
-            pecesNegres[2].cordY = 7;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 6;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 0;
-            bloquejosBlanques[0].cordY = 5;
-            bloquejosBlanques[0].usat = false;
-
-            bloquejosBlanques[1].cordX = 2;
-            bloquejosBlanques[1].cordY = 5;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 6;
-            bloquejosBlanques[2].cordY = 5;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 3;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = false;
-
-            bloquejosNegres[1].cordX = 5;
-            bloquejosNegres[1].cordY = 2;
-            bloquejosNegres[1].usat = false;
-
-            bloquejosNegres[2].cordX = 2;
-            bloquejosNegres[2].cordY = 3;
-            bloquejosNegres[2].usat = false;
-
-        }
-
-        static void EstablirPosició2(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //GUANYEN BLANQUES NO PODEN MOURE
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 1;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 1;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 2;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 5;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 0;
-            pecesNegres[0].cordY = 5;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 1;
-            pecesNegres[1].cordY = 4;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 0;
-            pecesNegres[2].cordY = 3;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 2;
-            pecesNegres[3].cordY = 3;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 2;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 0;
-            bloquejosBlanques[1].cordY = 0;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 0;
-            bloquejosBlanques[2].cordY = 0;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 3;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 0;
-            bloquejosNegres[1].cordY = 0;
-            bloquejosNegres[1].usat = false;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-        }
-
-        static void EstablirPosició3(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //GUANYEN BLANQUES
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 1;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 1;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 2;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 5;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 4;
-            pecesNegres[0].cordY = 5;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 1;
-            pecesNegres[1].cordY = 4;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 0;
-            pecesNegres[2].cordY = 3;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 2;
-            pecesNegres[3].cordY = 3;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 2;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 0;
-            bloquejosBlanques[1].cordY = 0;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 0;
-            bloquejosBlanques[2].cordY = 0;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 3;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 0;
-            bloquejosNegres[1].cordY = 0;
-            bloquejosNegres[1].usat = false;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-        }
-        static void EstablirPosició4(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //GUANYEN NEGRES
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 1;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 1;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 2;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 3;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 4;
-            pecesNegres[0].cordY = 5;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 1;
-            pecesNegres[1].cordY = 4;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 0;
-            pecesNegres[2].cordY = 3;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 2;
-            pecesNegres[3].cordY = 3;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 2;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 3;
-            bloquejosBlanques[1].cordY = 2;
-            bloquejosBlanques[1].usat = true;
-
-            bloquejosBlanques[2].cordX = 0;
-            bloquejosBlanques[2].cordY = 0;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 0;
-            bloquejosNegres[0].cordY = 0;
-            bloquejosNegres[0].usat = false;
-
-            bloquejosNegres[1].cordX = 0;
-            bloquejosNegres[1].cordY = 0;
-            bloquejosNegres[1].usat = false;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-        }
-        static void EstablirPosició5(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //TAULES
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 3;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 1;
-            pecesBlanques[1].cordY = 2;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 2;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 1;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 5;
-            pecesNegres[0].cordY = 6;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 6;
-            pecesNegres[1].cordY = 5;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 7;
-            pecesNegres[2].cordY = 4;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 0;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 4;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 2;
-            bloquejosBlanques[1].cordY = 3;
-            bloquejosBlanques[1].usat = true;
-
-            bloquejosBlanques[2].cordX = 3;
-            bloquejosBlanques[2].cordY = 2;
-            bloquejosBlanques[2].usat = true;
-
-            bloquejosNegres[0].cordX = 4;
-            bloquejosNegres[0].cordY = 5;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 5;
-            bloquejosNegres[1].cordY = 4;
-            bloquejosNegres[1].usat = true;
-
-            bloquejosNegres[2].cordX = 6;
-            bloquejosNegres[2].cordY = 3;
-            bloquejosNegres[2].usat = true;
-        }
-        static void EstablirPosició6(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //GUNYEN BLANQUES
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 1;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 2;
-            pecesBlanques[1].cordY = 1;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 4;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 7;
-            pecesBlanques[3].cordY = 0;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 1;
-            pecesNegres[0].cordY = 6;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 2;
-            pecesNegres[1].cordY = 7;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 3;
-            pecesNegres[2].cordY = 6;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 6;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 2;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 3;
-            bloquejosBlanques[1].cordY = 2;
-            bloquejosBlanques[1].usat = true;
-
-            bloquejosBlanques[2].cordX = 5;
-            bloquejosBlanques[2].cordY = 2;
-            bloquejosBlanques[2].usat = true;
-
-            bloquejosNegres[0].cordX = 0;
-            bloquejosNegres[0].cordY = 5;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 2;
-            bloquejosNegres[1].cordY = 5;
-            bloquejosNegres[1].usat = true;
-
-            bloquejosNegres[2].cordX = 4;
-            bloquejosNegres[2].cordY = 5;
-            bloquejosNegres[2].usat = true;
-        }
-        static void EstablirPosicióWorstOppening(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //TAN DOLENTA QUE PERD EN 16 MOVIMENTS
-            pecesBlanques[0].cordX = 0;
-            pecesBlanques[0].cordY = 1;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 3;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 7;
-            pecesBlanques[2].cordY = 0;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 1;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 2;
-            pecesNegres[0].cordY = 5;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 2;
-            pecesNegres[1].cordY = 7;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 4;
-            pecesNegres[2].cordY = 7;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 6;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 1;
-            bloquejosBlanques[0].cordY = 2;
-            bloquejosBlanques[0].usat = false;
-
-            bloquejosBlanques[1].cordX = 3;
-            bloquejosBlanques[1].cordY = 2;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 5;
-            bloquejosBlanques[2].cordY = 2;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 1;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 5;
-            bloquejosNegres[1].cordY = 2;
-            bloquejosNegres[1].usat = true;
-
-            bloquejosNegres[2].cordX = 7;
-            bloquejosNegres[2].cordY = 2;
-            bloquejosNegres[2].usat = true;
-        }
-        static void EstablirPosicióOperturaDolenta(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //TAN DOLENTA QUE PERD EN 16 MOVIMENTS
-            pecesBlanques[0].cordX = 1;
-            pecesBlanques[0].cordY = 0;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 3;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 6;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 7;
-            pecesBlanques[3].cordY = 0;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 0;
-            pecesNegres[0].cordY = 7;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 2;
-            pecesNegres[1].cordY = 7;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 4;
-            pecesNegres[2].cordY = 7;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 6;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 0;
-            bloquejosBlanques[0].cordY = 0;
-            bloquejosBlanques[0].usat = false;
-
-            bloquejosBlanques[1].cordX = 0;
-            bloquejosBlanques[1].cordY = 0;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 0;
-            bloquejosBlanques[2].cordY = 0;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 5;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 7;
-            bloquejosNegres[1].cordY = 2;
-            bloquejosNegres[1].usat = true;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-        }
-        static void EstablirPosicióOperturaComplexa(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //TAN DOLENTA QUE PERD EN 16 MOVIMENTS
-            pecesBlanques[0].cordX = 1;
-            pecesBlanques[0].cordY = 0;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 3;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 6;
-            pecesBlanques[2].cordY = 1;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 7;
-            pecesBlanques[3].cordY = 0;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 0;
-            pecesNegres[0].cordY = 7;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 2;
-            pecesNegres[1].cordY = 7;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 4;
-            pecesNegres[2].cordY = 7;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 6;
-            pecesNegres[3].cordY = 7;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 0;
-            bloquejosBlanques[0].cordY = 0;
-            bloquejosBlanques[0].usat = false;
-
-            bloquejosBlanques[1].cordX = 0;
-            bloquejosBlanques[1].cordY = 0;
-            bloquejosBlanques[1].usat = false;
-
-            bloquejosBlanques[2].cordX = 0;
-            bloquejosBlanques[2].cordY = 0;
-            bloquejosBlanques[2].usat = false;
-
-            bloquejosNegres[0].cordX = 5;
-            bloquejosNegres[0].cordY = 2;
-            bloquejosNegres[0].usat = true;
-
-            bloquejosNegres[1].cordX = 7;
-            bloquejosNegres[1].cordY = 2;
-            bloquejosNegres[1].usat = true;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-        }
-        static void EstablirPosicióPartida(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
-        {
-            //POSICIO ORIGINAL
-            pecesBlanques[0].cordX = 3;
-            pecesBlanques[0].cordY = 2;
-            pecesBlanques[0].mort = false;
-
-            pecesBlanques[1].cordX = 1;
-            pecesBlanques[1].cordY = 0;
-            pecesBlanques[1].mort = false;
-
-            pecesBlanques[2].cordX = 5;
-            pecesBlanques[2].cordY = 0;
-            pecesBlanques[2].mort = false;
-
-            pecesBlanques[3].cordX = 6;
-            pecesBlanques[3].cordY = 1;
-            pecesBlanques[3].mort = false;
-
-            pecesNegres[0].cordX = 0;
-            pecesNegres[0].cordY = 7;
-            pecesNegres[0].mort = false;
-
-            pecesNegres[1].cordX = 3;
-            pecesNegres[1].cordY = 6;
-            pecesNegres[1].mort = false;
-
-            pecesNegres[2].cordX = 0;
-            pecesNegres[2].cordY = 1;
-            pecesNegres[2].mort = false;
-
-            pecesNegres[3].cordX = 2;
-            pecesNegres[3].cordY = 1;
-            pecesNegres[3].mort = false;
-
-            bloquejosBlanques[0].cordX = 0;
-            bloquejosBlanques[0].cordY = 5;
-            bloquejosBlanques[0].usat = true;
-
-            bloquejosBlanques[1].cordX = 2;
-            bloquejosBlanques[1].cordY = 5;
-            bloquejosBlanques[1].usat = true;
-
-            bloquejosBlanques[2].cordX = 6;
-            bloquejosBlanques[2].cordY = 5;
-            bloquejosBlanques[2].usat = true;
-
-            bloquejosNegres[0].cordX = 0;
-            bloquejosNegres[0].cordY = 0;
-            bloquejosNegres[0].usat = false;
-
-            bloquejosNegres[1].cordX = 0;
-            bloquejosNegres[1].cordY = 0;
-            bloquejosNegres[1].usat = false;
-
-            bloquejosNegres[2].cordX = 0;
-            bloquejosNegres[2].cordY = 0;
-            bloquejosNegres[2].usat = false;
-
-        }
+        //4.2.2.1 (Funció principal)
         static ResultatPosició Jugar(Peça[] pecesAliadesOriginals, Peça[] pecesEnemiguesOriginals, Bloqueig[] bloquejosAliatsOriginals, Bloqueig[] bloquejosEnemicsOriginals, bool repetir, int profunditat)
         {
             //INICIALITZAR LES PECES I ELS BLOQUEJOS
@@ -833,7 +241,9 @@ namespace proves2
         }
 
 
-        //FUNCIONS DE SUPORT
+
+        //-------------FUNCIONS DE SUPORT-----------
+            //4.5.1
         static Peça[] GirarPeces(Peça[] peces)
         {
             Peça[] pecesGirades = new Peça[peces.Length];
@@ -856,6 +266,7 @@ namespace proves2
             }
             return bloquejosGirats;
         }
+            //4.2.2.1
         static int[,] RepresentarTauler(Peça[] pecesAliades, Peça[] pecesEnemigues, Bloqueig[] bloquejosAliats, Bloqueig[] bloquejosEnemics)
         {
             int[,] tauler = new int[8, 8];
@@ -890,6 +301,7 @@ namespace proves2
             }
             return tauler;
         }
+            //4.3.3 i 4.5.2
         static long Codificar(int[,] tauler, Bloqueig[] bloquejosAliats)
         {
             int[] xBlanques = new int[4];
@@ -974,6 +386,7 @@ namespace proves2
             //Console.WriteLine(Convert.ToString(resultat,2));
             return resultat;
         }
+            //4.3.2
         static void MostrarTauler(int[,] tauler, int profunditat)
         {
             for (int i = 7; i >= 0; i--)
@@ -1026,6 +439,7 @@ namespace proves2
             Console.WriteLine();
             System.Threading.Thread.Sleep(DELAY);
         }
+            //No se'n parla al treball escrit pero serveixen per copiar les structs.
         static Peça[] CopiarPeces(Peça[] peças)
         {
             Peça[] copia = new Peça[4];
@@ -1048,6 +462,7 @@ namespace proves2
             }
             return copia;
         }
+            //4.4.2.1
         static ResultatPosició AnalitzarResultats(ResultatPosició resultatOriginal, ResultatPosició resultatActual)
         {
             //SI L'ORIGINAL GUANYAVA NO TÉ SENTIT MIRAR ELS RESULTATS
@@ -1092,6 +507,7 @@ namespace proves2
             }
             return resultatOriginal;
         }
+            //4.4.1.2.1
         static bool PotColocarseBloqueig(int[,] tauler, int x, int y)
         {
             bool[,] copiaTauler = new bool[8, 8];
@@ -1109,6 +525,7 @@ namespace proves2
             return resultat;
 
         }
+            //4.5.1
         static ResultatPosició GirarResultat(ResultatPosició resultatOriginal)
         {
             ResultatPosició resultat;
@@ -1129,7 +546,10 @@ namespace proves2
             return resultat;
         }
 
-        //FUNCIONS GRANS
+
+
+        //------------FUNCIONS GRANS------------
+            //4.2.2.3
         static ResultatPosició Reapareixer(Peça[] pecesAliades, Peça[] pecesEnemigues, Bloqueig[] bloquejosAliats, Bloqueig[] bloquejosEnemics, int[,] tauler, int comptador)
         {
             ResultatPosició resultat;
@@ -1148,7 +568,9 @@ namespace proves2
                         copia[i].cordX = 1;
                         copia[i].cordY = 0;
                         copia[i].mort = false;
-                        resultat = AnalitzarResultats(resultat, Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador));
+                        ResultatPosició resultatA = Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador);
+                        resultatA.moviment = resultatA.moviment + ", Reapareixer a (1,0)";
+                        resultat = AnalitzarResultats(resultat, resultatA);
                         if (resultat.resultat == GUANYEN)
                         {
                             return resultat;
@@ -1161,7 +583,9 @@ namespace proves2
                         copia[i].cordX = 3;
                         copia[i].cordY = 0;
                         copia[i].mort = false;
-                        resultat = AnalitzarResultats(resultat, Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador));
+                        ResultatPosició resultatA = Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador);
+                        resultatA.moviment = resultatA.moviment + ", Reapareixer a (3,0)";
+                        resultat = AnalitzarResultats(resultat, resultatA);
                         if (resultat.resultat == GUANYEN)
                         {
                             return resultat;
@@ -1174,7 +598,9 @@ namespace proves2
                         copia[i].cordX = 5;
                         copia[i].cordY = 0;
                         copia[i].mort = false;
-                        resultat = AnalitzarResultats(resultat, Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador));
+                        ResultatPosició resultatA = Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador);
+                        resultatA.moviment = resultatA.moviment + ", Reapareixer a (5,0)";
+                        resultat = AnalitzarResultats(resultat, resultatA);
                         if (resultat.resultat == GUANYEN)
                         {
                             return resultat;
@@ -1187,7 +613,9 @@ namespace proves2
                         copia[i].cordX = 7;
                         copia[i].cordY = 0;
                         copia[i].mort = false;
-                        resultat = AnalitzarResultats(resultat, Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador));
+                        ResultatPosició resultatA = Jugar(copia, pecesEnemigues, bloquejosAliats, bloquejosEnemics, true, comptador);
+                        resultatA.moviment = resultatA.moviment + ", Reapareixer a (7,0)";
+                        resultat = AnalitzarResultats(resultat, resultatA);
                         if (resultat.resultat == GUANYEN)
                         {
                             return resultat;
@@ -1197,6 +625,7 @@ namespace proves2
             }
             return resultat;
         }
+            //4.2.2.2 -> 4.5.3
         static bool PotMoure(Peça[] pecesAliades, Bloqueig[] bloquejosAliats, int[,] tauler)
         {
             //MIRAR SI POT COLOCAR BLOQUEJOS
@@ -1277,6 +706,7 @@ namespace proves2
             }
             return false;
         }
+            //4.4.1.3
         static ResultatPosició Bloquejos(Peça[] pecesAliades, Peça[] pecesEnemigues, Bloqueig[] bloquejosAliats, Bloqueig[] bloquejosEnemics, int[,] tauler, int comptador)
         {
             ResultatPosició actual;
@@ -1340,6 +770,7 @@ namespace proves2
             }
             return resultat;
         }
+            //4.2.2.5
         static ResultatPosició Salts(int peça, Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres, int[,] tauler, int comptador)
         {
             ResultatPosició resultat;
@@ -1446,6 +877,7 @@ namespace proves2
             }
             return resultat;
         }
+            //4.2.2.4
         static ResultatPosició MovimentsBasics(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres, int[,] tauler, int comptador)
         {
             ResultatPosició resultat;
@@ -1493,6 +925,7 @@ namespace proves2
             }
             return resultat;
         }
+            //4.4.1.2.1
         static int AnalitzarPosició(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres, int[,] tauler) 
         {
             int resultat;
@@ -1541,6 +974,7 @@ namespace proves2
             resultat = (quantsBloquejosBlanques - quantsBloquejosNegres) * 6 + (pecesBlanquesLliures - pecesNegresLliures) * 10 + (espaiPecesBlanques - espaiPecesNegres);
             return resultat;
         }
+            //4.6.1.1
         static int ComptarPecesBloquejades(Peça peça, int[,] tauler, bool color) 
         {
             int resultat = 0;
@@ -1627,7 +1061,10 @@ namespace proves2
             }
         }
 
-        //FUNCIONS RECURSIVES COMPLEMENTS DE LES FUNCIONS GRANS
+
+
+        //---------FUNCIONS RECURSIVES COMPLEMENTS DE LES FUNCIONS GRANS---------
+            //4.5.3
         static bool GuanyaEn1Recursiu(int[,] tauler, Peça peça, bool vaALaDreta)
         {
             if (vaALaDreta)
@@ -1685,6 +1122,7 @@ namespace proves2
             }
             return false;
         }
+            //4.4.1.2.2
         static bool PotColocarseRecusiu(bool[,] tauler, int x, int y)
         {
             if (y == 5)
@@ -1707,6 +1145,785 @@ namespace proves2
                 }
             }
             return resultat;
+        }
+
+
+
+        //----------POSICIONS DE PROVA I TESTOS------------
+            //Posició inicial
+        static void EstablirPosicióInicial(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //POSICIO ORIGINAL
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 5;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 2;
+            bloquejosBlanques[1].cordY = 5;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 6;
+            bloquejosBlanques[2].cordY = 5;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 3;
+            bloquejosNegres[0].cordY = 2;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 5;
+            bloquejosNegres[1].cordY = 2;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 2;
+            bloquejosNegres[2].cordY = 3;
+            bloquejosNegres[2].usat = false;
+
+        }
+            
+            //Obertures
+        static void EstablirPosicióObertura1(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //b1 a a2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 7;
+            pecesNegres[3].cordY = 6;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 3;
+            bloquejosNegres[0].cordY = 2;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura2(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //b1 a c2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 5;
+            pecesNegres[3].cordY = 6;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura3(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //d1 a c2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 5;
+            pecesNegres[2].cordY = 6;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura4(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //d1 a e2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 3;
+            pecesNegres[2].cordY = 6;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura5(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //f1 a e2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 3;
+            pecesNegres[1].cordY = 6;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura6(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //f1 a g2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 1;
+            pecesNegres[1].cordY = 6;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosicióObertura7(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //h1 a g2
+            pecesBlanques[0].cordX = 1;
+            pecesBlanques[0].cordY = 0;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 3;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 5;
+            pecesBlanques[2].cordY = 0;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 1;
+            pecesNegres[0].cordY = 6;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 2;
+            pecesNegres[1].cordY = 7;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 4;
+            pecesNegres[2].cordY = 7;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 6;
+            pecesNegres[3].cordY = 7;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 0;
+            bloquejosBlanques[0].cordY = 0;
+            bloquejosBlanques[0].usat = false;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+            
+            //Proves 4.4.2
+        static void EstablirPosició2(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //GUNYEN BLANQUES PER OFEGAMENT
+            pecesBlanques[0].cordX = 0;
+            pecesBlanques[0].cordY = 1;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 1;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 2;
+            pecesBlanques[2].cordY = 1;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 6;
+            pecesBlanques[3].cordY = 5;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 5;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 1;
+            pecesNegres[1].cordY = 4;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 0;
+            pecesNegres[2].cordY = 3;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 2;
+            pecesNegres[3].cordY = 3;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 1;
+            bloquejosBlanques[0].cordY = 2;
+            bloquejosBlanques[0].usat = true;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 3;
+            bloquejosNegres[0].cordY = 2;
+            bloquejosNegres[0].usat = true;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosició3(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //GUANYEN BLANQUES PER ARRIBADA
+            pecesBlanques[0].cordX = 0;
+            pecesBlanques[0].cordY = 1;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 1;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 2;
+            pecesBlanques[2].cordY = 1;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 6;
+            pecesBlanques[3].cordY = 5;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 4;
+            pecesNegres[0].cordY = 5;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 1;
+            pecesNegres[1].cordY = 4;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 0;
+            pecesNegres[2].cordY = 3;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 2;
+            pecesNegres[3].cordY = 3;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 1;
+            bloquejosBlanques[0].cordY = 2;
+            bloquejosBlanques[0].usat = true;
+
+            bloquejosBlanques[1].cordX = 0;
+            bloquejosBlanques[1].cordY = 0;
+            bloquejosBlanques[1].usat = false;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 3;
+            bloquejosNegres[0].cordY = 2;
+            bloquejosNegres[0].usat = true;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosició4(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //GUANYEN NEGRES PER ARRIBADA
+            pecesBlanques[0].cordX = 0;
+            pecesBlanques[0].cordY = 1;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 1;
+            pecesBlanques[1].cordY = 0;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 2;
+            pecesBlanques[2].cordY = 1;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 6;
+            pecesBlanques[3].cordY = 3;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 4;
+            pecesNegres[0].cordY = 5;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 1;
+            pecesNegres[1].cordY = 4;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 0;
+            pecesNegres[2].cordY = 3;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 2;
+            pecesNegres[3].cordY = 3;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 1;
+            bloquejosBlanques[0].cordY = 2;
+            bloquejosBlanques[0].usat = true;
+
+            bloquejosBlanques[1].cordX = 3;
+            bloquejosBlanques[1].cordY = 2;
+            bloquejosBlanques[1].usat = true;
+
+            bloquejosBlanques[2].cordX = 0;
+            bloquejosBlanques[2].cordY = 0;
+            bloquejosBlanques[2].usat = false;
+
+            bloquejosNegres[0].cordX = 0;
+            bloquejosNegres[0].cordY = 0;
+            bloquejosNegres[0].usat = false;
+
+            bloquejosNegres[1].cordX = 0;
+            bloquejosNegres[1].cordY = 0;
+            bloquejosNegres[1].usat = false;
+
+            bloquejosNegres[2].cordX = 0;
+            bloquejosNegres[2].cordY = 0;
+            bloquejosNegres[2].usat = false;
+        }
+        static void EstablirPosició5(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //TAULES PER REPETICIÓ
+            pecesBlanques[0].cordX = 0;
+            pecesBlanques[0].cordY = 3;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 1;
+            pecesBlanques[1].cordY = 2;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 2;
+            pecesBlanques[2].cordY = 1;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 6;
+            pecesBlanques[3].cordY = 1;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 5;
+            pecesNegres[1].cordY = 6;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 6;
+            pecesNegres[2].cordY = 5;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 7;
+            pecesNegres[3].cordY = 4;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 4;
+            bloquejosBlanques[0].cordY = 5;
+            bloquejosBlanques[0].usat = true;
+
+            bloquejosBlanques[1].cordX = 5;
+            bloquejosBlanques[1].cordY = 4;
+            bloquejosBlanques[1].usat = true;
+
+            bloquejosBlanques[2].cordX = 6;
+            bloquejosBlanques[2].cordY = 3;
+            bloquejosBlanques[2].usat = true;
+
+            bloquejosNegres[0].cordX = 1;
+            bloquejosNegres[0].cordY = 4;
+            bloquejosNegres[0].usat = true;
+
+            bloquejosNegres[1].cordX = 2;
+            bloquejosNegres[1].cordY = 3;
+            bloquejosNegres[1].usat = true;
+
+            bloquejosNegres[2].cordX = 3;
+            bloquejosNegres[2].cordY = 2;
+            bloquejosNegres[2].usat = true;
+        }
+
+        //Altres posicions interessants
+        static void EstablirPosicióNoTaules(Peça[] pecesBlanques, Peça[] pecesNegres, Bloqueig[] bloquejosBlanques, Bloqueig[] bloquejosNegres)
+        {
+            //Posició del punt 4.2.1.3: Anti-intuitivament, guanyen blanques per arribada.
+            pecesBlanques[0].cordX = 0;
+            pecesBlanques[0].cordY = 3;
+            pecesBlanques[0].mort = false;
+
+            pecesBlanques[1].cordX = 1;
+            pecesBlanques[1].cordY = 2;
+            pecesBlanques[1].mort = false;
+
+            pecesBlanques[2].cordX = 2;
+            pecesBlanques[2].cordY = 1;
+            pecesBlanques[2].mort = false;
+
+            pecesBlanques[3].cordX = 7;
+            pecesBlanques[3].cordY = 0;
+            pecesBlanques[3].mort = false;
+
+            pecesNegres[0].cordX = 0;
+            pecesNegres[0].cordY = 7;
+            pecesNegres[0].mort = false;
+
+            pecesNegres[1].cordX = 5;
+            pecesNegres[1].cordY = 6;
+            pecesNegres[1].mort = false;
+
+            pecesNegres[2].cordX = 6;
+            pecesNegres[2].cordY = 5;
+            pecesNegres[2].mort = false;
+
+            pecesNegres[3].cordX = 7;
+            pecesNegres[3].cordY = 4;
+            pecesNegres[3].mort = false;
+
+            bloquejosBlanques[0].cordX = 4;
+            bloquejosBlanques[0].cordY = 5;
+            bloquejosBlanques[0].usat = true;
+
+            bloquejosBlanques[1].cordX = 5;
+            bloquejosBlanques[1].cordY = 4;
+            bloquejosBlanques[1].usat = true;
+
+            bloquejosBlanques[2].cordX = 6;
+            bloquejosBlanques[2].cordY = 3;
+            bloquejosBlanques[2].usat = true;
+
+            bloquejosNegres[0].cordX = 1;
+            bloquejosNegres[0].cordY = 4;
+            bloquejosNegres[0].usat = true;
+
+            bloquejosNegres[1].cordX = 2;
+            bloquejosNegres[1].cordY = 3;
+            bloquejosNegres[1].usat = true;
+
+            bloquejosNegres[2].cordX = 3;
+            bloquejosNegres[2].cordY = 2;
+            bloquejosNegres[2].usat = true;
         }
     }
 }
